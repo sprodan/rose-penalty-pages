@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🌹👓 Лидерборд штрафов</title>
+  <style>
+    :root {
+      --bg1: #160815;
+      --bg2: #2c1028;
+      --card: rgba(255,255,255,0.08);
+      --line: rgba(255,255,255,0.16);
+      --text: #ffeefb;
+      --muted: #e7cadd;
+      --accent: #ff4f9a;
+      --accent-2: #8f6bff;
+      --ok: #31d0aa;
+      --warn: #ff9f44;
+      --danger: #ff5f7a;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: radial-gradient(1200px 600px at 10% 0%, #471336 0%, transparent 55%),
+                  radial-gradient(900px 500px at 100% 10%, #2a1951 0%, transparent 55%),
+                  linear-gradient(160deg, var(--bg1), var(--bg2));
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 28px 16px 40px;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(26px, 5vw, 44px);
+      letter-spacing: 0.2px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: 14px;
+    }
+
+    .badge {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 860px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.2);
+      padding: 16px;
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    .table th,
+    .table td {
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    .table tr:last-child td { border-bottom: none; }
+
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 190px;
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: #fff;
+    }
+
+    .rank {
+      width: 28px;
+      font-weight: 700;
+      color: #ffd66e;
+    }
+
+    .mins {
+      font-weight: 700;
+      color: var(--warn);
+    }
+
+    .swear-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .pill {
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.07);
+      font-size: 13px;
+    }
+
+    .logs {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer {
+      margin-top: 14px;
+      font-size: 12px;
+      color: #dcb4cb;
+    }
+
+    .top {
+      background: linear-gradient(120deg, rgba(255,79,154,0.25), rgba(143,107,255,0.2));
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .zero {
+      color: var(--ok);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <h1>🌹👓 Лидерборд штрафов</h1>
+        <div class="subtitle">Красивый табло по участникам, штрафам и словарю матов</div>
+      </div>
+      <div class="badge" id="updatedAt"></div>
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <h2>🏆 Участники и штрафы</h2>
+        <div class="top" id="topLine"></div>
+        <table class="table" id="board"></table>
+      </section>
+
+      <section class="card">
+        <h2>🤬 Наши маты</h2>
+        <div class="swear-cloud" id="swears"></div>
+        <h2 style="margin-top:16px">📝 Последние записи</h2>
+        <ul class="logs" id="logs"></ul>
+      </section>
+    </div>
+
+    <div class="footer">Тема: rose noir. Аватарки сейчас авто-генерируются по юзернеймам; могу заменить на реальные в 1 клик.</div>
+  </div>
+
+  <script>
+    const users = [
+      { username: 'sprodan', name: 'stas prodan', penaltyMin: 3 },
+      { username: 'mprodan', name: 'mprodan', penaltyMin: 0 },
+      { username: 'Didinap', name: 'Didinap', penaltyMin: 0 },
+      { username: 'Papuc_Eugen', name: 'Papuc Eugen', penaltyMin: 0 }
+    ];
+
+    const logs = [
+      { date: '2026-02-13', username: 'sprodan', text: 'Блять сука', add: 1 },
+      { date: '2026-02-13', username: 'sprodan', text: 'Пидор', add: 1 },
+      { date: '2026-02-13', username: 'sprodan', text: 'Блять сука пидор ебаный', add: 1 }
+    ];
+
+    const swears = ['блять', 'сука', 'пидор', 'ебаный'];
+
+    const avatarUrl = (u) => `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(u)}`;
+
+    const sorted = [...users].sort((a,b) => b.penaltyMin - a.penaltyMin || a.username.localeCompare(b.username));
+
+    const top = sorted[0];
+    document.getElementById('topLine').innerHTML =
+      top.penaltyMin > 0
+      ? `<b>@${top.username}</b> лидирует с <b>${top.penaltyMin} мин</b> штрафа.`
+      : 'Пока штрафов нет. Все святые 😇';
+
+    const table = document.getElementById('board');
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Участник</th>
+          <th>Штраф</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${sorted.map((u, i) => `
+          <tr>
+            <td class="rank">${i + 1}</td>
+            <td>
+              <div class="user">
+                <img class="avatar" src="${avatarUrl(u.username)}" alt="${u.username}" />
+                <div>
+                  <div>@${u.username}</div>
+                  <div style="font-size:12px;color:#dcb4cb">${u.name}</div>
+                </div>
+              </div>
+            </td>
+            <td class="${u.penaltyMin === 0 ? 'zero' : 'mins'}">${u.penaltyMin} мин</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    `;
+
+    document.getElementById('swears').innerHTML = swears.map(w => `<span class="pill">${w}</span>`).join('');
+    document.getElementById('logs').innerHTML = logs.map(l => `<li>${l.date} — @${l.username}: «${l.text}» → +${l.add} мин</li>`).join('');
+
+    document.getElementById('updatedAt').textContent = `Обновлено: ${new Date().toLocaleString('ru-RU')}`;
+  </script>
+</body>
+</html>
